@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Free UC Top-Up</title>
+<style>
+:root{--bg:#10140f;--panel:#1a2016;--line:#2f3a28;--text:#eef2e6;--muted:#9aa68c;--gold:#f2b300;--danger:#ff4d3d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#10140f}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;display:flex;justify-content:center;padding:20px 14px}
+main{width:100%;max-width:440px}
+h1{font-size:1.7rem;margin:0 0 6px;letter-spacing:.5px}
+p.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:18px}
+label{display:block;margin-bottom:8px;color:var(--muted)}
+input{width:100%;padding:14px;font-size:1.05rem;background:#0c100a;border:2px solid var(--line);border-radius:4px;color:var(--text)}
+input:focus,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button{width:100%;margin-top:14px;padding:14px;font-size:1.05rem;font-weight:700;background:var(--gold);color:#1b1500;border:0;border-radius:4px;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.uc{background:#0c100a;border:2px solid var(--line);border-radius:4px;color:var(--text);padding:16px 8px;margin:0;font-weight:700}
+.uc:hover{border-color:var(--gold)}
+.uc small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.player{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.avatar{width:46px;height:46px;border-radius:4px;background:var(--gold);color:#1b1500;display:grid;place-items:center;font-weight:900;font-size:1.3rem}
+.bar{height:10px;background:#0c100a;border-radius:5px;overflow:hidden;margin-top:14px}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width 1.6s linear}
+.ok{color:var(--gold);font-size:1.4rem;font-weight:800;margin:0 0 6px}
+.prank{text-align:center}
+.prank h2{font-size:3rem;margin:10px 0;color:var(--danger);animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.prank h2{animation:none}.bar i{transition:none}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>UC Top-Up</h1>
+<p class="sub">Get UC delivered to your account.</p>
+
+<section class="card" id="s1">
+<label for="pid">Enter your Player ID</label>
+<input id="pid" inputmode="numeric" autocomplete="off" placeholder="e.g. 5123456789">
+<button id="find">Find my account</button>
+</section>
+
+<section class="card" id="s2" hidden>
+<div class="player"><div class="avatar">P</div><div><strong id="pname">Player</strong><div class="sub" style="margin:0">ID <span id="pshow"></span> · Account found</div></div></div>
+<label>Choose your UC amount</label>
+<div class="grid">
+<button class="uc" data-uc="60">60 UC</button>
+<button class="uc" data-uc="325">325 UC</button>
+<button class="uc" data-uc="660">660 UC</button>
+<button class="uc" data-uc="1800">1800 UC</button>
+</div>
+</section>
+
+<section class="card" id="s3" hidden>
+<p id="ptxt" style="margin:0">Processing your recharge…</p>
+<div class="bar"><i id="fill"></i></div>
+</section>
+
+<section class="card" id="s4" hidden>
+<p class="ok">Recharged successfully!</p>
+<p id="done" style="margin:0;color:var(--muted)"></p>
+</section>
+
+<section class="card prank" id="s5" hidden>
+<p style="margin:0;color:var(--muted)">Just kidding. Nothing was recharged.</p>
+<h2>PRANK!</h2>
+<p style="margin:0">You got pranked. No ID was saved or sent anywhere.</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const show=n=>{for(let i=1;i<=5;i++)$("s"+i).hidden=i!==n};
+$("find").onclick=()=>{
+  const v=$("pid").value.trim();
+  if(!/^\d{5,12}$/.test(v)){$("pid").focus();$("pid").setCustomValidity("");alert("Enter a valid numeric Player ID (5–12 digits).");return}
+  $("pshow").textContent=v;
+  $("pname").textContent="Player_"+v.slice(-4);
+  show(2);
+};
+document.querySelectorAll(".uc").forEach(b=>b.onclick=()=>{
+  const uc=b.dataset.uc;
+  show(3);
+  $("ptxt").textContent="Sending "+uc+" UC to your account…";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$("fill").style.width="100%"));
+  setTimeout(()=>{
+    $("done").textContent=uc+" UC added to ID "+$("pshow").textContent+".";
+    show(4);
+    setTimeout(()=>show(5),2200);
+  },1800);
+});
+</script>
+</body>
+</html>
